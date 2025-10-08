@@ -3,9 +3,12 @@
 <package format="3">
   <name>audio_output</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="logan@todo.todo">logan</maintainer>
+  <description>Output of one audio file from several distinct options</description>
+  <maintainer email="lowei4805@gmail.com">logan</maintainer>
   <license>MIT</license>
+
+  <exec_depend>rclpy</exec_depend>
+  #TODO: Abhängigkeit für Messagetyp einfügen
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

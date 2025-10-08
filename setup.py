@@ -14,8 +14,8 @@ setup(
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='logan',
-    maintainer_email='logan@todo.todo',
-    description='TODO: Package description',
+    maintainer_email='lowei4805@gmail.com',
+    description='Output of one audio file from several distinct options',
     license='MIT',
     extras_require={
         'test': [
@@ -24,6 +24,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'keyboard_listener = audio_output.keyboard_input:main',
         ],
     },
 )
