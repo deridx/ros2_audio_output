@@ -3,7 +3,7 @@ from rclpy.node import Node
 
 from std_msgs.msg import Bool
 
-from playsound import playsound
+#from playsound import playsound
 
 class SpeakerOutput(Node):
 
@@ -18,7 +18,7 @@ class SpeakerOutput(Node):
 
 	def audio_callback(self, msg):
 		if msg.data:
-			playsound('/audio_files/test_sound.mp3')
+			#playsound('/audio_files/test_sound.mp3')
 			self.get_logger().info('Playing sound')
 		else:
 		 self.get_logger().info('No sound played')
@@ -30,5 +30,5 @@ def main(args=None):
 
 	rclpy.spin(speaker_output)
 
-if name == '__main__':
+if __name__ == '__main__':
 	main()
