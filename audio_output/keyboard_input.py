@@ -8,7 +8,7 @@ class KeyboardInput(Node):
 	def __init__(self):
 		super().__init__('keyboard_input')
 		self.publisher_ = self.create_publisher(Bool, 'pressed_key',1)
-		timer_period = 1 #Sekunden
+		timer_period = 3 #Sekunden
 		self.timer = self.create_timer(timer_period, self.timer_callback)
 
 	def timer_callback(self):
