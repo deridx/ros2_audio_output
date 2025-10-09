@@ -25,6 +25,7 @@ setup(
     entry_points={
         'console_scripts': [
             'keyboard_listener = audio_output.keyboard_input:main',
+            'speaker = audio_output.speaker_output:main'
         ],
     },
 )
