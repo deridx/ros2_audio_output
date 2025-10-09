@@ -20,7 +20,8 @@ class SpeakerOutput(Node):
 		if msg.data:
 			playsound('/audio_files/test_sound.mp3')
 			self.get_logger().info('Playing sound')
-		else self.get_logger().info('No sound played')
+		else:
+		 self.get_logger().info('No sound played')
 
 def main(args=None):
 	rclpy.init(args=args)
