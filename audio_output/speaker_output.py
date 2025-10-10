@@ -3,14 +3,12 @@ from rclpy.node import Node
 
 from std_msgs.msg import Bool
 
-import pygame
-#from playsound import playsound
+from playsound import playsound
 
 class SpeakerOutput(Node):
 
 	def __init__(self):
 		super().__init__('speaker_output')
-		pygame.mixer.init()
 		self.subscription = self.create_subscription(
 			Bool,
 			'pressed_key',
@@ -20,9 +18,7 @@ class SpeakerOutput(Node):
 
 	def audio_callback(self, msg):
 		if msg.data:
-			#playsound("/src/audio_output/audio_output/test_sound_3.mp3")
-			pygame.mixer.music.load('test_sound_2.mp3')
-			pygame.mixer.music.play()
+			playsound("/home/logan/ros2_ws/src/audio_output/audio_output/audio_files/test_sound_2.mp3")
 			self.get_logger().info('Playing sound')
 		else:
 		 self.get_logger().info('No sound played')
