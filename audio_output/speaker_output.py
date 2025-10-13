@@ -18,10 +18,11 @@ class SpeakerOutput(Node):
 
 	def audio_callback(self, msg):
 		if msg.data:
-			playsound("/home/logan/ros2_ws/src/audio_output/audio_output/audio_files/test_sound_2.mp3")
-			self.get_logger().info('Playing sound')
+			playsound("/home/logan/ros2_ws/src/audio_output/audio_output/audio_files/test_sound_1.mp3")
+			self.get_logger().info('Playing sound 1')
 		else:
-		 self.get_logger().info('No sound played')
+			playsound("/home/logan/ros2_ws/src/audio_output/audio_output/audio_files/test_sound_2.mp3")
+			self.get_logger().info('Playing sound 2')
 
 def main(args=None):
 	rclpy.init(args=args)

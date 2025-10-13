@@ -3,17 +3,24 @@ from rclpy.node import Node
 
 from std_msgs.msg import Bool #TODO: eigenen Messagetyp erstelllen
 
+from pynput import keyboard
+
 class KeyboardInput(Node):
 
 	def __init__(self):
 		super().__init__('keyboard_input')
 		self.publisher_ = self.create_publisher(Bool, 'pressed_key',1)
-		timer_period = 3 #Sekunden
+		timer_period = 0.5 #Sekunden
 		self.timer = self.create_timer(timer_period, self.timer_callback)
 
 	def timer_callback(self):
 		msg = Bool()
-		msg.data = True
+		with keyboard.Events() as events:
+			event = events.get(0.4)
+			if event is None:
+				msg.data = False
+			else:
+				msg.data = True
 		self.publisher_.publish(msg)
 		self.get_logger().info('Publishing: "%s"' % msg.data)
 
