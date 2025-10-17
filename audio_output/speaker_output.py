@@ -15,9 +15,9 @@ class SpeakerOutput(Node):
 			self.sounds = yaml.safe_load(config)
 		self.subscription = self.create_subscription(
 			Joy,
-			'pressed_key',				#TODO: topic-Name ändern
+			'/joy',				#TODO: topic-Name ändern
 			self.audio_callback,
-			1)
+			10)
 		self.subscription
 
 	def audio_callback(self, msg):
@@ -26,21 +26,20 @@ class SpeakerOutput(Node):
 		sound3 = os.path.join(self.sounds["soundfolder"], self.sounds["filenames"]["name3"])
 		sound4 = os.path.join(self.sounds["soundfolder"], self.sounds["filenames"]["name4"])
 
-		dpad_up 	= msg.buttons[0]		#TODO: tatsächliche keys herausfinden
-		dpad_right 	= msg.buttons[1]
-		dpad_down 	= msg.buttons[2]
-		dpad_left 	= msg.buttons[3]
+		#Indizes für Nintendo-Controller, je nach Controller abändern
+		dpad_horizontal = msg.axes[4]		#1.0 == links, -1.0 == rechts
+		dpad_vertical 	= msg.axes[5]		#1.0 == oben, -1.0 == unten
 		
-		if dpad_up == 1 and dpad_right == 0 and dpad_down == 0 and dpad_left == 0:
+		if dpad_vertical == 1.0 and dpad_horizontal == 0.0:
 			playsound(sound1)
 			self.get_logger().info('Playing sound 1')
-		elif dpad_right == 1 and dpad_up == 0 and dpad_down == 0 and dpad_left == 0:
+		elif dpad_horizontal == -1.0 and dpad_vertical == 0.0:
 			playsound(sound2)
 			self.get_logger().info('Playing sound 2')
-		elif dpad_down == 1 and dpad_up == 0 and dpad_right == 0 and dpad_left == 0:
+		elif dpad_vertical == -1.0 and dpad_horizontal == 0.0:
 			playsound(sound3)
 			self.get_logger().info('Playing sound 3')
-		elif dpad_left == 1 and dpad_up == 0 and dpad_right == 0 and dpad_down == 0:
+		elif dpad_horizontal == 1.0 and dpad_vertical == 0.0:
 			playsound(sound4)
 			self.get_logger().info('Playing sound 4')
 		else:
