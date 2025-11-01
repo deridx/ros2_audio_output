@@ -8,7 +8,7 @@
   <license>MIT</license>
 
   <exec_depend>rclpy</exec_depend>
-  #TODO: Abhängigkeit für Messagetyp einfügen
+  <exec_depend>joy</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
