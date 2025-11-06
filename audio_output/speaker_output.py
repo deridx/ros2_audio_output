@@ -7,13 +7,7 @@ from multiprocessing import Process, Value
 
 from sensor_msgs.msg import Joy
 
-from playsound import playsound			#unterstützen .wav und .mp3
-#from audioplayer import AudioPlayer
-# import simpleaudio							#unterstützt nur .wav-Format
-# from pydub import AudioSegment
-# from pydub.playback import play
-# from tkinter import *
-# import tkSnack
+from playsound import playsound			#unterstützt .wav und .mp3
 
 class SpeakerOutput(Node):
 
@@ -35,41 +29,51 @@ class SpeakerOutput(Node):
 		self.soundpath3 = os.path.join(self.sounds["soundfolder"], self.sounds["filenames"]["name3"])
 		self.soundpath4 = os.path.join(self.sounds["soundfolder"], self.sounds["filenames"]["name4"])
 
+		self.sound1 = None
+		self.sound2 = None
+		self.sound3 = None
+		self.sound4 = None
+
 	def _play(self, path, sound):
 		self.is_playing.value = sound
 		playsound(path)
 		self.is_playing.value = "no_sound"
 	
 	def _sound(self, play_req):
-		if play_req == self.is_playing.value or play_req == "no_sound":
+		if play_req == "no_sound":
+			self.get_logger().info('Not playing a sound')
+
+		if play_req == self.is_playing.value:
 			self.get_logger().info('Not playing a sound')
 		else:
+			# Ton, der gerade spielt abbrechen
+			match self.is_playing.value:
+				case "sound1":
+					self.sound1.interrupt()
+				case "sound2":
+					self.sound2.interrupt()
+				case "sound3":
+					self.sound3.interrupt()
+				case "sound4":
+					self.sound4.interrupt()
+			# neuen Ton starten
 			match play_req:
 				case "sound1":
-					sound1 = Process(target=self._play, kwargs={"path": self.soundpath1, "sound": play_req})
-					sound1.start()
+					self.sound1 = Process(target=self._play, kwargs={"path": self.soundpath1, "sound": play_req})
+					self.sound1.start()
 					self.get_logger().info('Playing sound 1')
 				case "sound2":
-					sound2 = Process(target=self._play, kwargs={"path": self.soundpath2, "sound": play_req})
-					sound2.start()
+					self.sound2 = Process(target=self._play, kwargs={"path": self.soundpath2, "sound": play_req})
+					self.sound2.start()
 					self.get_logger().info('Playing sound 2')
 				case "sound3":
-					sound3 = Process(target=self._play, kwargs={"path": self.soundpath3, "sound": play_req})
-					sound3.start()
-					# waveobject3 = simpleaudio.WaveObject.from_wave_file(self.soundpath3)
-					# sound3 = waveobject3.play()
-					# song = AudioSegment.from_wav(self.soundpath3)
-					# play(song)
-					# snd = tkSnack.Sound()
-					# snd.read('sound.wav')
-					# snd.play(blocking=1)
-					# AudioPlayer(soundpath3).play(block=True)
+					self.sound3 = Process(target=self._play, kwargs={"path": self.soundpath3, "sound": play_req})
+					self.sound3.start()
 					self.get_logger().info('Playing sound 3')
 				case "sound4":
-					sound4 = Process(target=self._play, kwargs={"path": self.soundpath4, "sound": play_req})
-					sound4.start()
+					self.sound4 = Process(target=self._play, kwargs={"path": self.soundpath4, "sound": play_req})
+					self.sound4.start()
 					self.get_logger().info('Playing sound 4')
-
 	
 	def audio_callback(self, msg):
 		play_req = ""
