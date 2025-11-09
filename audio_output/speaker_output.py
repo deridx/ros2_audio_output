@@ -2,6 +2,7 @@ import rclpy
 from rclpy.node import Node
 import yaml
 import os
+import time
 
 from sensor_msgs.msg import Joy
 
@@ -19,8 +20,9 @@ class SpeakerOutput(Node):
 			'joy',
 			self.audio_callback,
 			10)
-		self.i = 0
 		self.subscription
+
+		self.previous_input = "none"
 
 		self.soundpath1 = os.path.join(self.sounds["soundfolder"], self.sounds["filenames"]["name1"])
 		self.soundpath2 = os.path.join(self.sounds["soundfolder"], self.sounds["filenames"]["name2"])
@@ -30,74 +32,96 @@ class SpeakerOutput(Node):
 		self.sound1 = None
 		self.sound2 = None
 		self.sound3 = simpleaudio.WaveObject.from_wave_file(self.soundpath3)
-		self.sound4 = None
+		self.sound4 = simpleaudio.WaveObject.from_wave_file(self.soundpath4)
 
 		self.playing3 = self.sound3.play()
 		self.playing3.stop()
+		self.playing4 = self.sound4.play()
+		self.playing4.stop()
 
-	def _play(self, path, sound):
-		self.playing3 = self.sound3.play()
-		# AudioPlayer(path).play(block=True)
+	def _play(self, sound):
+		match sound:
+			case 1: self.playing1 = self.sound1.play()
+			case 2: self.playing2 = self.sound2.play()
+			case 3: self.playing3 = self.sound3.play()
+			case 4: self.playing4 = self.sound4.play()
 	
-	def _check_playstate(self):
+	def _sound(self, to_play):
+		# überprüfen, welcher Ton gerade spielt
+		is_playing = 0
+		# if self.playing1.is_playing():
+		# 	is_playing = 1
+		# if self.playing2.is_playing():
+		# 	is_playing = 2
 		if self.playing3.is_playing():
-			return "sound3"
-		else:
-			return "no_sound"
-	
-	def _sound(self, play_req):
-		is_playing = self._check_playstate()
+			is_playing = 3
+		if self.playing4.is_playing():
+			is_playing = 4
 
-		if play_req == "no_sound":
-			self.get_logger().info('Not playing a sound')
-
-		if play_req == is_playing:
+		if to_play == 0:
 			self.get_logger().info('Not playing a sound')
 		else:
-			# Ton, der gerade spielt abbrechen
+			# Ton, der gerade spielt, abbrechen
 			match is_playing:
-				case "sound1":
-					self.playing1.stop()
-				case "sound2":
-					self.playing2.stop()
-				case "sound3":
-					self.playing3.stop()
-				case "sound4":
-					self.playing4.stop()
+				case 1: self.playing1.stop()
+				case 2: self.playing2.stop()
+				case 3: self.playing3.stop()
+				case 4: self.playing4.stop()
+			if to_play == is_playing:
+				self.get_logger().info('Stopped playing a sound')
+			else:
+				time.sleep(0.5)
 			# neuen Ton starten
-			match play_req:
-				case "sound1":
-					self.get_logger().info('Playing sound 1')
-					self._play(self.soundpath1, play_req)
-				case "sound2":
-					self.get_logger().info('Playing sound 2')
-					self._play(self.soundpath2, play_req)
-				case "sound3":
-					self.get_logger().info('Playing sound 3')
-					self._play(self.soundpath3, play_req)
-				case "sound4":
-					self.get_logger().info('Playing sound 4')
-					self._play(self.soundpath4, play_req)
+				match to_play:
+					case 1:
+						self.get_logger().info('Playing sound 1')
+						self._play(1)
+					case 2:
+						self.get_logger().info('Playing sound 2')
+						self._play(2)
+					case 3:
+						self.get_logger().info('Playing sound 3')
+						self._play(3)
+					case 4:
+						self.get_logger().info('Playing sound 4')
+						self._play(4)
+
+	def _get_action(self, c_input):
+		# Herausfiltern von Mehrfachinputs
+		if c_input == "none":
+			to_play = 0
+		elif c_input == self.previous_input:
+			to_play = 0
+		else:
+			match c_input:
+				case "up": to_play = 1
+				case "right": to_play = 2
+				case "down": to_play = 3
+				case "left": to_play = 4
+		self.previous_input = c_input
+		return to_play
 	
 	def audio_callback(self, msg):
-		play_req = ""
+		c_input = ""
 		
-		#Indizes für Nintendo-Controller, je nach Controller abändern
+		#Indizes von joy.axes für Nintendo-Controller, je nach Controller abändern
 		dpad_horizontal = msg.axes[4]		#1.0 == links, -1.0 == rechts
 		dpad_vertical 	= msg.axes[5]		#1.0 == oben, -1.0 == unten
 
 		if dpad_vertical == 1.0 and dpad_horizontal == 0.0:
-			play_req = "sound1"
+			c_input = "up"
 		elif dpad_horizontal == -1.0 and dpad_vertical == 0.0:
-			play_req = "sound2"
+			c_input = "right"
 		elif dpad_vertical == -1.0 and dpad_horizontal == 0.0:
-			play_req = "sound3"
+			c_input = "down"
 		elif dpad_horizontal == 1.0 and dpad_vertical == 0.0:
-			play_req = "sound4"
+			c_input = "left"
 		else:
-			play_req = "no_sound"
+			c_input = "none"
+
+		to_play = self._get_action(c_input)
 		
-		self._sound(play_req)
+		self._sound(to_play)
 
 def main(args=None):
 	rclpy.init(args=args)
