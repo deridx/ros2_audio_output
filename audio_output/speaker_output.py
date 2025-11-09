@@ -2,12 +2,11 @@ import rclpy
 from rclpy.node import Node
 import yaml
 import os
-import ctypes
-from multiprocessing import Process, Value
 
 from sensor_msgs.msg import Joy
 
-from playsound import playsound			#unterstützt .wav und .mp3
+# from audioplayer import AudioPlayer
+import simpleaudio
 
 class SpeakerOutput(Node):
 
@@ -20,7 +19,6 @@ class SpeakerOutput(Node):
 			'joy',
 			self.audio_callback,
 			10)
-		self.is_playing = Value(ctypes.c_wchar_p, "no_sound")
 		self.i = 0
 		self.subscription
 
@@ -31,49 +29,55 @@ class SpeakerOutput(Node):
 
 		self.sound1 = None
 		self.sound2 = None
-		self.sound3 = None
+		self.sound3 = simpleaudio.WaveObject.from_wave_file(self.soundpath3)
 		self.sound4 = None
 
+		self.playing3 = self.sound3.play()
+		self.playing3.stop()
+
 	def _play(self, path, sound):
-		self.is_playing.value = sound
-		playsound(path)
-		self.is_playing.value = "no_sound"
+		self.playing3 = self.sound3.play()
+		# AudioPlayer(path).play(block=True)
+	
+	def _check_playstate(self):
+		if self.playing3.is_playing():
+			return "sound3"
+		else:
+			return "no_sound"
 	
 	def _sound(self, play_req):
+		is_playing = self._check_playstate()
+
 		if play_req == "no_sound":
 			self.get_logger().info('Not playing a sound')
 
-		if play_req == self.is_playing.value:
+		if play_req == is_playing:
 			self.get_logger().info('Not playing a sound')
 		else:
 			# Ton, der gerade spielt abbrechen
-			match self.is_playing.value:
+			match is_playing:
 				case "sound1":
-					self.sound1.interrupt()
+					self.playing1.stop()
 				case "sound2":
-					self.sound2.interrupt()
+					self.playing2.stop()
 				case "sound3":
-					self.sound3.interrupt()
+					self.playing3.stop()
 				case "sound4":
-					self.sound4.interrupt()
+					self.playing4.stop()
 			# neuen Ton starten
 			match play_req:
 				case "sound1":
-					self.sound1 = Process(target=self._play, kwargs={"path": self.soundpath1, "sound": play_req})
-					self.sound1.start()
 					self.get_logger().info('Playing sound 1')
+					self._play(self.soundpath1, play_req)
 				case "sound2":
-					self.sound2 = Process(target=self._play, kwargs={"path": self.soundpath2, "sound": play_req})
-					self.sound2.start()
 					self.get_logger().info('Playing sound 2')
+					self._play(self.soundpath2, play_req)
 				case "sound3":
-					self.sound3 = Process(target=self._play, kwargs={"path": self.soundpath3, "sound": play_req})
-					self.sound3.start()
 					self.get_logger().info('Playing sound 3')
+					self._play(self.soundpath3, play_req)
 				case "sound4":
-					self.sound4 = Process(target=self._play, kwargs={"path": self.soundpath4, "sound": play_req})
-					self.sound4.start()
 					self.get_logger().info('Playing sound 4')
+					self._play(self.soundpath4, play_req)
 	
 	def audio_callback(self, msg):
 		play_req = ""
