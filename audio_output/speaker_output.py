@@ -29,11 +29,15 @@ class SpeakerOutput(Node):
 		self.soundpath3 = os.path.join(self.sounds["soundfolder"], self.sounds["filenames"]["name3"])
 		self.soundpath4 = os.path.join(self.sounds["soundfolder"], self.sounds["filenames"]["name4"])
 
-		self.sound1 = None
-		self.sound2 = None
+		self.sound1 = simpleaudio.WaveObject.from_wave_file(self.soundpath1)
+		self.sound2 = simpleaudio.WaveObject.from_wave_file(self.soundpath2)
 		self.sound3 = simpleaudio.WaveObject.from_wave_file(self.soundpath3)
 		self.sound4 = simpleaudio.WaveObject.from_wave_file(self.soundpath4)
 
+		self.playing1 = self.sound1.play()
+		self.playing1.stop()
+		self.playing2 = self.sound2.play()
+		self.playing2.stop()
 		self.playing3 = self.sound3.play()
 		self.playing3.stop()
 		self.playing4 = self.sound4.play()
@@ -49,10 +53,10 @@ class SpeakerOutput(Node):
 	def _sound(self, to_play):
 		# überprüfen, welcher Ton gerade spielt
 		is_playing = 0
-		# if self.playing1.is_playing():
-		# 	is_playing = 1
-		# if self.playing2.is_playing():
-		# 	is_playing = 2
+		if self.playing1.is_playing():
+			is_playing = 1
+		if self.playing2.is_playing():
+			is_playing = 2
 		if self.playing3.is_playing():
 			is_playing = 3
 		if self.playing4.is_playing():
@@ -70,8 +74,8 @@ class SpeakerOutput(Node):
 			if to_play == is_playing:
 				self.get_logger().info('Stopped playing a sound')
 			else:
+				# neuen Ton starten
 				time.sleep(0.5)
-			# neuen Ton starten
 				match to_play:
 					case 1:
 						self.get_logger().info('Playing sound 1')

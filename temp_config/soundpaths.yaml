@@ -1,6 +1,6 @@
 soundfolder: /home/logan/ros2_ws/src/audio_output/audio_files
 filenames:
- name1: test_sound_1.mp3
- name2: test_sound_2.mp3
- name3: test_sound_3.wav
- name4: test_sound_4.wav
+ name1: Achtung.wav
+ name2: Anfahren.wav
+ name3: Vorfahrt.wav
+ name4: Hallo.wav
