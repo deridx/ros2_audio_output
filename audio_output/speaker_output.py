@@ -13,7 +13,7 @@ class SpeakerOutput(Node):
 
 	def __init__(self):
 		super().__init__('speaker_output')
-		with open("/home/logan/ros2_ws/src/audio_output/temp_config/soundpaths.yaml", "r") as config:
+		with open("/home/logan/ros2_ws/src/audio_output/config/soundpaths.yaml", "r") as config:
 			self.sounds = yaml.safe_load(config)
 		self.subscription = self.create_subscription(
 			Joy,
